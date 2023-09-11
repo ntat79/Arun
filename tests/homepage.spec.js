@@ -3,20 +3,18 @@ const { test, expect } = require('@playwright/test');
 import { HomePage } from '../pages/HomePage';
 
 
-test('has title', async ({ page }) => {
-  const homePage = new HomePage(page);
+test('Verify the Search conditions are set correctly.', async ({ page }) => {
+  const homePage = new HomePage(page); 
   await homePage.goToHomePage();
-  // Expect a title "to contain" a substring.
+  // Expect the URL to mathc "https://jp.mercari.com/"
   await expect(page).toHaveURL('https://jp.mercari.com/');
   await homePage.searchTest()
-});
 
-test('get started link', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
+  const firstCategory = await page.locator("(//*[@id='accordion_content']//select)[1]")
+  expect(await firstCategory.inputValue()).toBe("5") // Verify the dropdown has correct selected option using value i.e "5"
 
-  // Click the get started link.
-  await page.getByRole('link', { name: 'Get started' }).click();
+  const secondCategory = await page.locator("(//*[@id='accordion_content']//select)[2]")
+  expect(await secondCategory.inputValue()).toBe("72") // Verify the dropdown has correct selected option using value i.e "72"
 
-  // Expects page to have a heading with the name of Installation.
-  await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
+  expect(await page.locator("input[value='674']").isChecked()).toBeTruthy() // verifying that the checkbox is checked
 });
