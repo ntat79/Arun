@@ -3,8 +3,9 @@
 ### Environment Setup
 
 #### Install Node.js 
-[Node JS](https://nodejs.org/en) and
-[VS Code](https://code.visualstudio.com/) 
+[Node JS](https://nodejs.org/en) ,
+[VS Code](https://code.visualstudio.com/) and
+[Playwright](https://playwright.dev/docs/intro)
 
 ### Execution Setup
 Clone the project 

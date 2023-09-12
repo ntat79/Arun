@@ -13,7 +13,7 @@ export class HomePage{
         this.smartPhonesCameraApplicancesCategoryLink = page.locator('a', { hasText: '家電・スマホ・カメラ' });
         this.smartPhonesCategoryLink = page.locator('a', { hasText: 'スマートフォン/携帯電話' }); 
         this.smartPhoneBodyCategoryLink = page.locator('a', { hasText: 'スマートフォン本体' });
-        this.browsingHistory = page.locator("//section[@data-testid='search-history']//a")
+        this.browsingHistory = page.locator("//*[@data-testid='search-history']//a")
         this.searchButton = page.getByTestId('search-input').getByLabel('検索', { exact: true })
     }
 
@@ -22,7 +22,7 @@ export class HomePage{
         await this.page.goto('https://jp.mercari.com/')
     }
 
-    // This method performs click  action in which takes user to the books category verification page
+    // This method creates book/music category as a first search history
     async createFirstSearchHistory(){
         await this.page.click(this.searchBar);  // Click on the home page search bar
         await this.searchByCategoryLink.click(); // Click on the first option shown
@@ -31,7 +31,7 @@ export class HomePage{
         await this.computerITCategoryLink.click(); // Click on the 'コンピュータ/IT' category link
     }
 
-    // This method performs click  action in which takes user to the smartphone category verification page
+    // This method creates smartphone category as a second search history
     async createSecondSearchHistory(){
         await this.page.click(this.searchBar);  // Click on the home page search bar
         await this.searchByCategoryLink.click(); // Click on the first option shown
@@ -40,19 +40,25 @@ export class HomePage{
         await this.smartPhoneBodyCategoryLink.click();
     }
 
+    // This method helps to keep the expected order of the browsing history
     async arrangeTheSearchHistoryOrder(){
         await this.createSecondSearchHistory();
         await this.goToHomePage();
         await this.createFirstSearchHistory();
     }
 
+    // This method verifies browsing history order
+    // 1st: コンピュータ/IT 
+    // 2nd: スマートフォン本体
     async verifyBrowingHistory(){
         await expect(this.browsingHistory).toHaveCount(2);
         await expect(this.browsingHistory).toHaveText(['コンピュータ/IT', 'スマートフォン本体']);
+        await this.page.pause();
+        
     }
 
     async goToFirstCategory(){
-        await this.page.click(this.searchBar);
+        await this.page.getByPlaceholder('なにをお探しですか？').click()
         await this.browsingHistory.first().click();
     }
 
@@ -61,19 +67,33 @@ export class HomePage{
         await this.firstBrowsingHistory.click();
     }
 
-    async searchManuallyAndCountTheBrowingHistory(){
-        await this.page.getByPlaceholder('なにをお探しですか？').fill('javascript');
+    /**
+     * This method adds a new browing history and then verified the count of browser history
+     * this method also verifies the order of the browsing history
+     * @param {*} manual_search_text search item name
+     */
+    async searchManuallyAndCountTheBrowingHistory(manual_search_text){
+        await this.page.getByPlaceholder('なにをお探しですか？').fill(manual_search_text); // search for item
         await this.searchButton.click()
-        await this.goToHomePage()
+        await this.goToHomePage() // Go to mercari home page
         await this.page.getByPlaceholder('なにをお探しですか？').click()
-        await expect(this.browsingHistory).toHaveCount(3);
-        await expect(this.browsingHistory).toHaveText(['javascript, コンピュータ/IT', 'コンピュータ/IT', 'スマートフォン本体']);
+        await expect(this.browsingHistory).toHaveCount(3); // count of browser history shown
+        // order of browing history
+        await expect(this.browsingHistory).toHaveText(['javascript, コンピュータ/IT', 'コンピュータ/IT', 'スマートフォン本体']); 
     }
 
+    /**
+     * This method verified that the dropdown shows the correct category
+     * @param {*} value Value is the index no from the dropdown
+     */
     async verifyfirstCategoryResult(value){
         await expect(this.page.locator("(//*[@id='accordion_content']//select)[1]")).toHaveValue(value)
     }
-
+    
+    /**
+     * This method verified that the dropdown shows the correct category
+     * @param {*} value Value is the index no from the dropdown
+     */
     async verifySecondCategoryResult(value){
         await expect(this.page.getByRole('combobox').nth(1)).toHaveValue(value)
     }
