@@ -22,5 +22,11 @@ $ npm install
 
 3. Run the test using
 ```bash
-$ npx playwright test --project=chromium
+$ npx playwright test --project=chromium --retries=3
 ```
+
+If there are any failures because of slow network , Please try to run in debug mode
+```bash
+$ npx playwright test --project=chromium --headed --debug
+```
+
